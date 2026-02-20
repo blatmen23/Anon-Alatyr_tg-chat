@@ -1,0 +1,7 @@
+services:
+  bot:
+    build: .
+    container_name: aa-tg-bot
+    restart: unless-stopped
+    volumes:
+      - ./database.db:/anon-alatyr-tg-chat/database.db

@@ -1,41 +1,13 @@
-# Билд стадия
-FROM python:3.12-alpine AS builder
+FROM python:3.10-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-# Устанавливаем системные зависимости для компиляции
-RUN apk add --no-cache \
-    gcc \
-    musl-dev \
-    libffi-dev \
-    openssl-dev
-
-WORKDIR /build
+WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Финальная стадия
-FROM python:3.12-alpine
-
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
-
-# Устанавливаем только runtime зависимости
-RUN apk add --no-cache \
-    libffi \
-    libssl3
-
-WORKDIR /anon-alatyr-tg-chat
-
-# Копируем установленные пакеты из builder
-COPY --from=builder /root/.local /root/.local
-
-# Добавляем путь к локальным пакетам
-ENV PATH="/root/.local/bin:${PATH}"
-
-# Копируем код
 COPY . .
 
 CMD ["python", "main.py"]
